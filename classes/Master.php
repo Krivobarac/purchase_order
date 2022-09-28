@@ -39,6 +39,12 @@ Class Master extends DBConnection {
 			return json_encode($resp);
 			exit;
 		}
+		if(empty($name)){
+			$resp['status'] = 'failed';
+			$resp['msg'] = "Supplier name is required.";
+			return json_encode($resp);
+			exit;
+		}
 		if(empty($id)){
 			$sql = "INSERT INTO `supplier_list` set {$data} ";
 			$save = $this->conn->query($sql);

@@ -25,7 +25,8 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
     <div class="container-fluid">
         <div class="form-group">
             <label for="name" class="control-label">Supplier Name</label>
-            <input type="text" name="name" id="name" class="form-control rounded-0" value="<?php echo isset($name) ? $name :"" ?>" required>
+            <input type="text" name="name" id="name" class="form-control rounded-0"
+                value="<?php echo isset($name) ? $name : (isset($_GET['supplier']) ? $_GET['supplier'] : "") ?>" required>
         </div>
         <div class="form-group">
             <label for="address" class="control-label">Address</label>

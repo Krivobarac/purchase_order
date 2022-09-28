@@ -9,6 +9,31 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 }
 ?>
 <style>
+	.select2-search--dropdown {
+		position: relative;
+	}
+
+	.select2-search--dropdown .icon {
+		padding: 2.5px 6px;
+		right: 5px;
+		bottom: 6px;
+	}
+
+	.select2-search--dropdown .btn.icon {
+		position: absolute;
+	}
+
+	#supplier-plus-button[data-title-text]:hover::after {
+		content: attr(data-title-text);
+		font-weight: bold;
+		position: absolute;
+		top: -150%;
+		left: 0;
+		background-color: #5A6E83;
+		width: max-content;
+		padding: 5px 10px;
+	}
+
     span.select2-selection.select2-selection--single {
         border-radius: 0;
         padding: 0.25rem 0.5rem;
@@ -19,19 +44,19 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
         height: auto;
     }
 	/* Chrome, Safari, Edge, Opera */
-		input::-webkit-outer-spin-button,
-		input::-webkit-inner-spin-button {
-		-webkit-appearance: none;
-		margin: 0;
-		}
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+	}
 
-		/* Firefox */
-		input[type=number] {
-		-moz-appearance: textfield;
-		}
-		[name="tax_percentage"],[name="discount_percentage"]{
-			width:5vw;
-		}
+	/* Firefox */
+	input[type=number] {
+	-moz-appearance: textfield;
+	}
+	[name="tax_percentage"],[name="discount_percentage"]{
+		width:5vw;
+	}
 </style>
 <div class="card card-outline card-info">
 	<div class="card-header">
@@ -240,6 +265,7 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 			}
 		})
 	}
+
 	$(document).ready(function(){
 		$('#add_row').click(function(){
 			var tr = $('#item-clone tr').clone()
@@ -267,7 +293,9 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 		}else{
 		$('#add_row').trigger('click')
 		}
-        $('.select2').select2({placeholder:"Please Select here",width:"relative"})
+
+        const select2 = $('.select2').select2({placeholder:"Please Select here",width:"relative"})
+		
 		$('#po-form').submit(function(e){
 			e.preventDefault();
             var _this = $(this)
@@ -314,6 +342,17 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 			})
 		})
 
-        
-	})
+		select2.on("select2:open", function (e) {
+			if($("#supplier-plus-button").length == 0) {
+				$(".select2-search--dropdown")
+					.append('<div data-title-text="Create new Supplier" id="supplier-plus-button" class="btn btn-primary icon"><span class="fa fa-plus"></span></div>');
+				$('#supplier-plus-button').click(function(){
+					var searchValue = $(".select2-search__field").val();
+					$('#supplier_id').select2('close');
+					uni_modal("<i class='fa fa-plus'></i> Register New Supplier", "suppliers/manage_supplier.php" + (searchValue ? "?supplier=" + searchValue : ""))
+				})
+			}
+		});
+	});
+
 </script>
