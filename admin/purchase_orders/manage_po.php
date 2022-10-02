@@ -14,24 +14,25 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 	}
 
 	.select2-search--dropdown .icon {
+		position: absolute;
 		padding: 2.5px 6px;
 		right: 5px;
 		bottom: 6px;
 	}
 
-	.select2-search--dropdown .btn.icon {
-		position: absolute;
-	}
-
-	#supplier-plus-button[data-title-text]:hover::after {
+	[data-title-text]:hover::after {
+		z-index: 2;
 		content: attr(data-title-text);
 		font-weight: bold;
 		position: absolute;
-		top: -150%;
 		left: 0;
 		background-color: #5A6E83;
 		width: max-content;
 		padding: 5px 10px;
+	}
+
+	#supplier-plus-button[data-title-text]:hover::after {
+		top: -150%;
 	}
 
     span.select2-selection.select2-selection--single {
@@ -43,11 +44,44 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
         padding-left: 0.5rem;
         height: auto;
     }
+	
+
+	span.select2-selection.select2-selection--single .select2-selection__rendered,
+	.select2-results__option {
+		display: flex;
+    	justify-content: space-between;
+	}
+
+	span.select2-selection.select2-selection--single .select2-selection__rendered span {
+		line-height: 2.1rem;
+	}
+
 	/* Chrome, Safari, Edge, Opera */
 	input::-webkit-outer-spin-button,
 	input::-webkit-inner-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
+	}
+
+	#item-plus-button[data-title-text]:hover::after {
+		top: 150%;
+	}
+
+	.po-item td {
+		position: relative;
+	}
+	
+	.po-item td input {
+		padding-right: 2rem;
+		z-index: 9999;
+	}
+
+	.po-item td .icon {
+		position: absolute;
+		padding: 1px 5px;
+		right: 3px;
+		bottom: 3px;
+		border-radius: 0 0.2rem 0.2rem 0;
 	}
 
 	/* Firefox */
@@ -68,14 +102,16 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 			<div class="row">
 				<div class="col-md-6 form-group">
 				<label for="supplier_id">Supplier</label>
-				<select name="supplier_id" id="supplier_id" class="custom-select custom-select-sm rounded-0 select2">
+					<select name="supplier_id" id="supplier_id" class="custom-select custom-select-sm rounded-0 select2">
 						<option value="" disabled <?php echo !isset($supplier_id) ? "selected" :'' ?>></option>
 						<?php 
 							$supplier_qry = $conn->query("SELECT * FROM `supplier_list` order by `name` asc");
 							while($row = $supplier_qry->fetch_assoc()):
 						?>
-						<option value="<?php echo $row['id'] ?>" <?php echo isset($supplier_id) && $supplier_id == $row['id'] ? 'selected' : '' ?> <?php echo $row['status'] == 0? 'disabled' : '' ?>><?php echo $row['name'] ?></option>
-						<?php endwhile; ?>
+						<option value="<?php echo $row['id'] ?>" <?php echo isset($supplier_id) && $supplier_id == $row['id'] ? 'selected' : '' ?> <?php echo $row['status'] == 0 ? 'disabled' : '' ?>><?php echo $row['name'].'~'.$row['contact'] ?></option>
+						<?php
+							endwhile;
+						?>
 					</select>
 				</div>
 				<div class="col-md-6 form-group">
@@ -206,6 +242,7 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 		<td class="align-middle p-1 text-right total-price">0</td>
 	</tr>
 </table>
+
 <script>
 	function rem_item(_this){
 		_this.closest('tr').remove()
@@ -277,6 +314,8 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 			$('#item-list tfoot').find('[name="discount_percentage"],[name="tax_percentage"]').on('input keypress',function(e){
 				calculate()
 			})
+
+			addNewItemButton();
 		})
 		if($('#item-list .po-item').length > 0){
 			$('#item-list .po-item').each(function(){
@@ -294,10 +333,19 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 		$('#add_row').trigger('click')
 		}
 
-        const select2 = $('.select2').select2({placeholder:"Please Select here",width:"relative"})
+        const select2 = $('.select2').select2({
+			placeholder:"Please select here",
+			width:"relative",
+			escapeMarkup : function(text){
+				text = text.split("~");
+				if (typeof(text[1]) == "undefined") {
+					text[1] = "";
+				}
+				return '<span>'+text[0]+'</span><span>'+text[1]+'</span>' || '';
+			}
+		})
 		
 		$('#po-form').submit(function(e){
-			e.preventDefault();
             var _this = $(this)
 			$('.err-msg').remove();
 			$('[name="po_no"]').removeClass('border-danger')
@@ -353,6 +401,37 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 				})
 			}
 		});
-	});
 
+		function addNewItemButton() {
+			$(".item_id").on("focus", function (e) {
+				if($("#item-plus-button").length == 0) {
+					var iconEl = document.createElement('div');
+					var iconSpan = document.createElement('span');
+
+					iconEl.setAttribute('data-title-text', 'Create new Item');
+					iconEl.setAttribute('id', 'item-plus-button');
+					iconEl.setAttribute('class', 'btn');
+					iconEl.classList.add('btn-primary');
+					iconEl.classList.add('icon');
+
+					iconSpan.setAttribute('class', 'fa');
+					iconSpan.classList.add('fa-plus');
+
+					iconEl.append(iconSpan);
+					e.target.parentElement.append(iconEl);
+
+					$('#item-plus-button').on('mousedown', function(el){
+						var inputValue = e.target.value;
+						uni_modal("<i class='fa fa-plus'></i> Create New Item", "items/manage_item.php" + (inputValue ? "?item=" + inputValue : ""));
+					})
+				}
+			});
+
+			$(".item_id").on("blur", function (e) {
+				if($("#item-plus-button").length > 0) {
+					$('#item-plus-button').remove();
+				}
+			});
+		}
+	});
 </script>

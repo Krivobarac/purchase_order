@@ -99,6 +99,12 @@ Class Master extends DBConnection {
 			return json_encode($resp);
 			exit;
 		}
+		if(empty($name)){
+			$resp['status'] = 'failed';
+			$resp['msg'] = "Item name is required.";
+			return json_encode($resp);
+			exit;
+		}
 		if(empty($id)){
 			$sql = "INSERT INTO `item_list` set {$data} ";
 		}else{
