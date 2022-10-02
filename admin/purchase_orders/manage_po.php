@@ -14,24 +14,25 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 	}
 
 	.select2-search--dropdown .icon {
+		position: absolute;
 		padding: 2.5px 6px;
 		right: 5px;
 		bottom: 6px;
 	}
 
-	.select2-search--dropdown .btn.icon {
-		position: absolute;
-	}
-
-	#supplier-plus-button[data-title-text]:hover::after {
+	[data-title-text]:hover::after {
+		z-index: 2;
 		content: attr(data-title-text);
 		font-weight: bold;
 		position: absolute;
-		top: -150%;
 		left: 0;
 		background-color: #5A6E83;
 		width: max-content;
 		padding: 5px 10px;
+	}
+
+	#supplier-plus-button[data-title-text]:hover::after {
+		top: -150%;
 	}
 
     span.select2-selection.select2-selection--single {
@@ -48,6 +49,28 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 	input::-webkit-inner-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
+	}
+
+	#item-plus-button[data-title-text]:hover::after {
+		top: 150%;
+	}
+
+	.po-item td {
+		position: relative;
+	}
+	
+	.po-item td input {
+		padding-right: 2rem;
+		z-index: 9999;
+	}
+
+	.po-item td .icon {
+		position: absolute;
+		padding: 0 6px;
+		right: 3px;
+		bottom: 3px;
+		border-radius: 0 0.25rem 0.25rem 0;
+		height: calc(100% - .4rem)
 	}
 
 	/* Firefox */
@@ -277,6 +300,8 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 			$('#item-list tfoot').find('[name="discount_percentage"],[name="tax_percentage"]').on('input keypress',function(e){
 				calculate()
 			})
+
+			addNewItemButton();
 		})
 		if($('#item-list .po-item').length > 0){
 			$('#item-list .po-item').each(function(){
@@ -297,7 +322,6 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
         const select2 = $('.select2').select2({placeholder:"Please Select here",width:"relative"})
 		
 		$('#po-form').submit(function(e){
-			e.preventDefault();
             var _this = $(this)
 			$('.err-msg').remove();
 			$('[name="po_no"]').removeClass('border-danger')
@@ -353,6 +377,37 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 				})
 			}
 		});
-	});
 
+		function addNewItemButton() {
+			$(".item_id").on("focus", function (e) {
+				if($("#item-plus-button").length == 0) {
+					var iconEl = document.createElement('div');
+					var iconSpan = document.createElement('span');
+
+					iconEl.setAttribute('data-title-text', 'Create new Item');
+					iconEl.setAttribute('id', 'item-plus-button');
+					iconEl.setAttribute('class', 'btn');
+					iconEl.classList.add('btn-primary');
+					iconEl.classList.add('icon');
+
+					iconSpan.setAttribute('class', 'fa');
+					iconSpan.classList.add('fa-plus');
+
+					iconEl.append(iconSpan);
+					e.target.parentElement.append(iconEl);
+
+					$('#item-plus-button').on('mousedown', function(el){
+						var inputValue = e.target.value;
+						uni_modal("<i class='fa fa-plus'></i> Create New Item", "items/manage_item.php" + (inputValue ? "?item=" + inputValue : ""));
+					})
+				}
+			});
+
+			$(".item_id").on("blur", function (e) {
+				if($("#item-plus-button").length > 0) {
+					$('#item-plus-button').remove();
+				}
+			});
+		}
+	});
 </script>
