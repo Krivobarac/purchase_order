@@ -218,7 +218,7 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
                         end_loader();
                         nw.close()
                     }, 300);
-                }, 200);
+                }, 400);
         })
     })
 </script>
