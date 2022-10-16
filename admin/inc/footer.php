@@ -25,7 +25,6 @@
         $.ajax({
             url:$url,
             error:err=>{
-                console.log()
                 alert("An error occured")
             },
             success:function(resp){

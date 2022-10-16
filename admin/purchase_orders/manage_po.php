@@ -296,7 +296,7 @@ if(isset($_GET['id']) && $_GET['id'] > 0){
 				})
 			},
 			select:function(event,ui){
-				console.log(ui)
+				// console.log(ui)
 				_item.find('input[name="item_id[]"]').val(ui.item.id)
 				_item.find('.item-description').text(ui.item.description)
 			}

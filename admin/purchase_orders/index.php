@@ -49,8 +49,8 @@
 							<td class=""><?php echo date("M d,Y H:i",strtotime($row['date_created'])) ; ?></td>
 							<td class=""><?php echo $row['po_no'] ?></td>
 							<td class=""><?php echo $row['sname'] ?></td>
-							<td class="text-right"><?php echo number_format($row['item_count']) ?></td>
-							<td class="text-right"><?php echo number_format($row['total_amount']) ?></td>
+							<td class=""><?php echo number_format($row['item_count']) ?></td>
+							<td class=""><?php echo number_format($row['total_amount']) ?></td>
 							<td>
 								<?php 
 									switch ($row['status']) {
@@ -90,7 +90,7 @@
 <script>
 	$(document).ready(function(){
 		$('.delete_data').click(function(){
-			_conf("Are you sure to delete this rent permanently?","delete_rent",[$(this).attr('data-id')])
+			_conf("Are you sure to delete this rent permanently?","delete_po",[$(this).attr('data-id')])
 		})
 		$('.view_details').click(function(){
 			uni_modal("Reservaton Details","purchase_orders/view_details.php?id="+$(this).attr('data-id'),'mid-large')
@@ -101,10 +101,10 @@
 		$('.table th,.table td').addClass('px-1 py-0 align-middle')
 		$('.table').dataTable();
 	})
-	function delete_rent($id){
+	function delete_po($id){
 		start_loader();
 		$.ajax({
-			url:_base_url_+"classes/Master.php?f=delete_rent",
+			url:_base_url_+"classes/Master.php?f=delete_po",
 			method:"POST",
 			data:{id: $id},
 			dataType:"json",
